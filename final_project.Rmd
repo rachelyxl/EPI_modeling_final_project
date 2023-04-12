@@ -1,0 +1,182 @@
+---
+title: "final_project"
+author: "Yu He"
+date: "2023-04-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(deSolve)
+```
+
+
+```{r}
+# Define initial conditions and parameters
+init <- c(S = 7365931, I = 50, R = 0, P = 0) # initial population sizes for each compartment
+params <- c(beta1 = 0.4, beta2 = 0.3, beta3 = 0.2, gamma = 0.1, rho = 1.0, N = 7395278) # transmission, recovery, and reporting rates
+rho_factor <- c(1.0, 1.5, 2.0, 1.0) # factor to adjust reporting rate
+times <- seq(0, 180, by = 1) # time range to solve the model
+
+# Define the differential equations for each phase
+sir_model <- function(time, state, parameters, rho_factor) {
+  with(as.list(c(state, parameters)), {
+    if (time < 30) {
+      beta <- beta1 # ordinary phase
+      rho <- rho_factor[1] * rho # adjust reporting rate based on time period
+    } else if (time >= 30 & time < 60) {
+      beta <- beta2 # awareness phase
+      rho <- rho_factor[2] * rho # adjust reporting rate based on time period
+    } else if (time >= 60 & time < 90) {
+      beta <- beta3 # spreading phase
+      rho <- rho_factor[3] * rho # adjust reporting rate based on time period
+    } else {
+      beta <- beta3 # decline phase
+      rho <- rho_factor[4] * rho # adjust reporting rate based on time period
+    }
+    dS <- -beta * S * I / N
+    dI <- beta * S * I / N - gamma * I
+    dR <- gamma * I
+    dP <- rho * I
+    return(list(c(dS, dI, dR, dP)))
+  })
+}
+
+# Solve the model for each phase
+out1 <- ode(y = init, times = times[1:30], func = sir_model, parms = params, rho_factor = rho_factor[1])
+init2 <- tail(out1, n = 1)[, c("S", "I", "R", "P")]
+out2 <- ode(y = init2, times = times[31:60], func = sir_model, parms = params, rho_factor = rho_factor[2])
+init3 <- tail(out2, n = 1)[, c("S", "I", "R", "P")]
+out3 <- ode(y = init3, times = times[61:90], func = sir_model, parms = params, rho_factor = rho_factor[3])
+init4 <- tail(out3, n = 1)[, c("S", "I", "R", "P")]
+out4 <- ode(y = init4, times = times[91:180], func = sir_model, parms = params, rho_factor = rho_factor[4])
+
+# Combine the results and estimate the weekly influenza cases
+out <- rbind(out1, out2, out3, out4)
+out = as.data.frame(out)
+
+ggplot(out, aes(x = time, y = I)) +
+geom_line(color = "blue") +
+labs(title = "Infected Cases vs Time",
+x = "Time (days)", y = "Infected Cases") +
+theme_minimal()
+```
+
+
+
+```{r}
+# Model function for TS-SIR
+ts_sir_model <- function(time, state, parameters) {
+  with(as.list(c(state, parameters)),{
+    # rate of change
+    dS = -beta * S * I / N
+    dI = beta * S * I / N - gamma * I
+    dR = gamma * I
+    dP = rho * I
+    # cumulative incidence
+    dcumInci = beta*S*I/N;
+    
+    # return the rate of change
+    list(c(dS, dI, dR, dP, dcumInci))
+  }) # end with(as.list...)
+}
+
+
+  # Calculating Rt
+ # Rt = R0 * Cj * (S / N）
+
+
+# Initial state values
+S0 = 7380000  # Approximate initial susceptible population
+I0 = 1        # Initial infected population
+R0 = 0        # Initial recovered population
+P0 = 0 
+E0 = 10
+
+state <- c(S = S0, I = I0, R = R0, P = P0, cumInci=E0)
+
+# Parameters for the model
+params_phase1 <- c(beta = 0.4, gamma = 0.1, N = 7395278, R0 = 1.29, Cj = 1, rho = 1)
+params_phase2 <- c(beta = 0.3, gamma = 0.1, N = 7395278, R0 = 1.29, Cj = 0.73, rho = 1)  # Adjust Cj and rho for Phase 2
+params_phase3 <- c(beta = 0.2, gamma = 0.1, N = 7395278, R0 = 1.29, Cj = 0.44, rho = 1)  # Adjust Cj and rho for Phase 3
+
+# Time points for each phase
+time_phase1 <- seq(0, 11, by = 1)
+time_phase2 <- seq(12, 33, by = 1)
+time_phase3 <- seq(34, 54, by = 1)
+
+# Solve the model for each phase
+result_phase1 <- ode(y = state,
+                     times = time_phase1,
+                     func = ts_sir_model,
+                     parms = params_phase1)
+
+# Update initial state values for the next phase
+initial_state_values <- result_phase1[nrow(result_phase1), 2:4]
+
+result_phase2 <- ode(y = state,
+                     times = time_phase2,
+                     func = ts_sir_model,
+                     parms = params_phase2)
+
+# Update initial state values for the next phase
+initial_state_values <- result_phase2[nrow(result_phase2), 2:4]
+
+result_phase3 <- ode(y = state,
+                     times = time_phase3,
+                     func = ts_sir_model,
+                     parms = params_phase3)
+
+# Combine the results of all phases
+result_all_phases <- rbind(result_phase1, result_phase2, result_phase3)
+
+# Plot infected people vs time
+plot(result_all_phases[, "time"], result_all_phases[, "I"],
+     type = "l",
+     xlab = "Time (Weeks)",
+     ylab = "Number of Infected People",
+     main = "Number of Infected People vs Time",
+     col = "blue")
+
+```
+
+
+```{r}
+# Calculate Rt for each time point
+Rt_values <- params_phase1["R0"] * params_phase1["Cj"] * (result_all_phases[, "S"] / params_phase1["N"])
+
+# Update Rt values for Phase 2
+Rt_values[time_phase2] <- params_phase2["R0"] * params_phase2["Cj"] * (result_all_phases[time_phase2, "S"] / params_phase2["N"])
+
+# Update Rt values for Phase 3
+Rt_values[time_phase3] <- params_phase3["R0"] * params_phase3["Cj"] * (result_all_phases[time_phase3, "S"] / params_phase3["N"])
+
+# Plot Rt vs time
+plot(result_all_phases[, "time"], Rt_values,
+     type = "l",
+     xlab = "Time (Weeks)",
+     ylab = "Effective Reproduction Number (Rt)",
+     main = "Effective Reproduction Number (Rt) vs Time",
+     col = "red")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
