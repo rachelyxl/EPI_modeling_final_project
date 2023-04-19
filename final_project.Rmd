@@ -41,11 +41,11 @@ cumInci0 = 104170	# Initial cumulative incidence collected from the real data
 state <- c(S = S0, I = I0, R = R0, cumInci = cumInci0)
 
 # Parameters for the model
-# Cj is the contact ratio, rho is the reporting rate, obtained from the article's simulation, 0.2, 0.02, 0.07; 0.1, 0.05, 0.15
-# the reporduction number R0 is 1.31, 1.42, 1.08
+# Cj is the contact ratio, rho is the reporting rate, obtained from the article's simulation.
+# the reporduction number R0 is 1.31, 1.42, 1.08. R0 = beta/(mu + gamma). beta = R0 / (gamma + mu)
 params_phase1 <- c(beta = 4.585, gamma = 1/3.5, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 1, rho = 0.9)
-params_phase2 <- c(beta = 9.94, gamma = 1/7, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 0.73, rho = 0.8)  # Adjust Cj and rho for Phase 2
-params_phase3 <- c(beta = 4.32, gamma = 1/4, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 0.44, rho = 0.75)  # Adjust Cj and rho for Phase 3
+params_phase2 <- c(beta = 4.97, gamma = 1/3.5, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 0.73, rho = 0.8)  # Adjust Cj and rho for Phase 2
+params_phase3 <- c(beta = 3.78, gamma = 1/3.5, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 0.44, rho = 0.75)  # Adjust Cj and rho for Phase 3
 
 # Time points for each phase
 time_phase1 <- seq(0, 11, by = 1) # ordinary phase, before January 12, 2020
@@ -127,7 +127,7 @@ plot(result_all_phases[, "time"], result_all_phases[, "I"],
      type = "l",
      xlab = "Time (Days)",
      ylab = "Number of Infected People",
-     main = "Number of Infected People vs the simulation with and without Covid-19 impact and real data",
+     main = "Infected People vs the simulation with and without Covid-19 impact and real data",
      col = "blue",
      ylim = c(0, 6000000))
 
