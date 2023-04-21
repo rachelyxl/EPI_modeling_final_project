@@ -1,0 +1,143 @@
+---
+title: "para_est"
+author: "Yu He"
+date: "2023-04-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(deSolve)
+library(R0)
+```
+
+
+# Part 1, import the real influenza data
+```{r}
+# real influenza cases from Jan 12 to Feb 23
+para_est <- read_csv("dat0.csv") %>% 
+  janitor::clean_names() %>% 
+  subset(date < 43830) 
+
+cumI = cumsum(para_est[,3])
+
+
+# Define the reference date
+reference_date <- as.Date("2020-01-01")
+
+para_R0_est = read_csv("dat0.csv") %>% 
+  subset(date >= 43830) %>%
+  janitor::clean_names() %>% 
+  mutate(
+    date = reference_date + (date - 43835)
+  ) %>% 
+  select(date, real_flu_case)
+
+
+## Always plot and check the data first
+par(mar = c(3, 3, 1, 1), cex = 1.2, mgp = c(1.5, .5,0))
+plot(para_R0_est$date, para_R0_est$real_flu_case, xlab ='time', ylab = 'Cases', pch = 20)
+
+para_R0_est$real_flu_case
+```
+
+## modify the orginal data and insert dates for everyday
+```{r}
+# create the original data frame
+dates <- c("2020-01-01", "2020-01-08", "2020-01-15", "2020-01-22", "2020-01-29", "2020-02-05", "2020-02-12", "2020-02-19", "2020-02-26", "2020-03-04", "2020-03-11", "2020-03-18")
+real_flu_cases <- c(591, 1211, 1159, 1181, 1003, 320, 93, 23, 18, 7, 17, 25)
+df <- data.frame(date = as.Date(dates), real_flu_case = real_flu_cases)
+
+# create a new data frame with every day between min and max date
+min_date <- min(df$date)
+max_date <- max(df$date)
+date_range <- seq(min_date, max_date, by='day')
+new_df <- data.frame(date = date_range)
+
+# merge the new data frame with the original data frame
+df <- merge(x=new_df, y=df, by='date', all.x=TRUE)
+df$real_flu_case[is.na(df$real_flu_case)] <- 0
+
+
+# plot the real flu cases over time
+ggplot(df, aes(x=date, y=real_flu_case)) +
+  geom_line() +
+  labs(x="Date", y="Real Flu Cases", title="Real Flu Cases over Time")
+```
+
+
+# Part 2, alculate the cumulative incidence using the daily incidence dataset and plot the log(cumulative incidence) v. time
+```{r}
+# cumpute the cumulative incidence using the cumsum function
+cumI = cumsum(df[,2]);
+
+# calculate the log - cumulative incidence
+log_cumI = log(cumsum(df[,2]))
+
+par(mar = c(3, 3, 1, 1), cex = 1.2, mgp = c(1.5, .5,0))
+plot(df$date, log_cumI, main = "Log - Cumulative incidence for 1918 Germany flu", xlab ='Date', ylab = 'log - cumulative incidence', pch = 20)
+
+
+```
+
+
+# Part 3, Assume a generation time of 3.5 days, estimate R0 from the exponential growth phase of the epidemic (try the first 12, 34, and 50 days), using the following equation:
+# Report your R0 estimates for the three time periods (i.e., the first 7, 14, and 21 days)
+```{r}
+# EXAMPLE: FOR THE FIRST 11 DAYS
+# Fit to the data during the first 11 days:
+D = 3.5; # set the generation time to 3.5 days
+Ndays = 12;  # ADJUST THE NUMBER OF DAYS INCLUDED IN THE FIT HERE
+tm1 = 1:Ndays;
+fit1 = lm(log(cumI[1:Ndays]) ~ tm1)
+summary(fit1)
+
+# compute R0 based on the model-fit
+R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
+```
+
+
+```{r}
+# EXAMPLE: FOR THE FIRST 34 DAYS
+# Fit to the data during the first 11 days:
+D = 3.5; # set the generation time to 3.5 days
+Ndays = 34;  # ADJUST THE NUMBER OF DAYS INCLUDED IN THE FIT HERE
+tm1 = 1:Ndays;
+fit1 = lm(log(cumI[1:Ndays]) ~ tm1)
+summary(fit1)
+
+# compute R0 based on the model-fit
+R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
+```
+
+
+```{r}
+# EXAMPLE: FOR THE FIRST 50 DAYS
+# Fit to the data during the first 11 days:
+D = 3.5; # set the generation time to 3.5 days
+Ndays = 50;  # ADJUST THE NUMBER OF DAYS INCLUDED IN THE FIT HERE
+tm1 = 1:Ndays;
+fit1 = lm(log(cumI[1:Ndays]) ~ tm1)
+summary(fit1)
+
+# compute R0 based on the model-fit
+R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
