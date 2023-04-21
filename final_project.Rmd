@@ -132,60 +132,12 @@ para_R0_est = read_csv("dat0.csv") %>%
 ```
 
 
-## plot Number of Infected People vs the simulation with and without Covid-19 impact and real  data
-```{r}
-# plot the infectous
-plot(result_all_phases[, "time"], result_all_phases[, "I"],
-     type = "l",
-     xlab = "Time (Days)",
-     ylab = "Number of Infected People",
-     main = "Infected People vs the simulation with and without Covid-19 impact and real data",
-     col = "blue",
-     ylim = c(0, 10000))
-
-# plot the second line
-lines(result_no[, "time"], result_no[, "I"],
-      col = "red")
-
-# add a legend to the plot
-legend("topright", legend = c("With Covid-19 impact", "Without Covid-19 impact"),
-       col = c("blue", "red"), lty = 1)
-
-```
-
-
-# use ggplot and convert X axis to dates with verticle lines of 3 stages.
+## plot Number of Infected People vs the simulation with and without Covid-19 impact and real data
 ```{r}
 result_all_phases = as.data.frame(result_all_phases)
 result_no = as.data.frame(result_no)
 
-# Convert time values to dates
-start_date <- as.Date("2020-01-01")
-result_all_phases$date <- start_date + result_all_phases$time
-result_no$date <- start_date + result_no$time
 
-# Plot the infected people vs time with dates on the x-axis
-plot(result_all_phases$date, result_all_phases$I,
-     type = "l",
-     xlab = "Date",
-     ylab = "Number of Infected People",
-     main = "Infected People vs the simulation with and without Covid-19 impact and real data",
-     col = "blue",
-     ylim = c(0, 10000))
-
-# Plot the second line
-lines(result_no$date, result_no$I,
-      col = "red")
-
-# Add a legend to the plot
-legend("topright", legend = c("With Covid-19 impact", "Without Covid-19 impact"),
-       col = c("blue", "red"), lty = 1)
-
-```
-
-
-## use ggplot and convert X axis to dates with verticle lines of 3 stages.
-```{r}
 # Convert time values to dates
 start_date <- as.Date("2020-01-01")
 result_all_phases$date <- start_date + result_all_phases$time
@@ -265,7 +217,7 @@ plot(result_no[, "time"], result_no[, "I"],
      type = "l",
      xlab = "Time (Days)",
      ylab = "Number of Infected People",
-     main = "Number of Infected People vs Time in the simulation without Covid-19 impact",
+     main = "Number of Infectious vs Time without Covid-19 impact",
      col = "blue",
      ylim = c(0, 500000))
 
@@ -274,7 +226,7 @@ plot(result_no[, "time"], result_no[, "I"] / N *100,
      type = "l",
      xlab = "Time (Days)",
      ylab = "% Infected People",
-     main = "% Infected People vs Time in the simulation without Covid-19 impact",
+     main = "% Infectious vs Time without Covid-19 impact",
      col = "blue",
      ylim = c(0, 5))
 ```
