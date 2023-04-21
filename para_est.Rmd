@@ -125,6 +125,18 @@ R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
 ```
 
 
+```{r}
+# EXAMPLE: FOR THE FIRST 50 DAYS
+# Fit to the data during the first 11 days:
+D = 3.5; # set the generation time to 3.5 days
+Ndays = 50;  # ADJUST THE NUMBER OF DAYS INCLUDED IN THE FIT HERE
+tm1 = 1:Ndays;
+fit1 = lm(log(cumI[1:Ndays]) ~ tm1)
+summary(fit1)
+
+# compute R0 based on the model-fit
+R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
+```
 
 
 
