@@ -43,7 +43,8 @@ state <- c(S = S0, I = I0, R = R0, cumInci = cumInci0)
 
 # Parameters for the model
 # Cj is the contact ratio, rho is the reporting rate, obtained from the article's simulation.
-# the reporduction number R0 is 1.31(1.48), 1.23(1.26), 1.08(1.16). R0 = beta/(mu + gamma). beta = R0 * (gamma + mu), 0.41
+# the reproduction number R0 is 1.31(1.48), 1.23(1.26), 1.08(1.16). R0 = beta/(mu + gamma). beta = R0 * (gamma + mu), 0.41. R0 in () is the estimated R0 by our team. and R0 = 1.31, 1.23, and 10.8 is provided by the article. 
+# the process of estimate R0 can be found in the para_est.RMD file. 
 params_phase1 <- c(beta = 0.42, gamma = 1/3.5, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 1, rho = 0.9)
 params_phase2 <- c(beta = 0.36, gamma = 1/3.5, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 0.73, rho = 0.8)  # Adjust Cj and rho for Phase 2
 params_phase3 <- c(beta = 0.33, gamma = 1/3.5, mu = 1/85/365, omega = 2*pi/365, N = 7395278, Cj = 0.44, rho = 0.75)  # Adjust Cj and rho for Phase 3
@@ -221,7 +222,7 @@ plot(result_no[, "time"], result_no[, "I"],
      ylab = "Number of Infected People",
      main = "Number of Infectious vs Time without Covid-19 impact",
      col = "blue",
-     ylim = c(0, 500000))
+     ylim = c(0, 700000))
 
 # % infectious
 plot(result_no[, "time"], result_no[, "I"] / N *100,
@@ -230,7 +231,7 @@ plot(result_no[, "time"], result_no[, "I"] / N *100,
      ylab = "% Infected People",
      main = "% Infectious vs Time without Covid-19 impact",
      col = "blue",
-     ylim = c(0, 5))
+     ylim = c(0, 8))
 ```
 
 
@@ -238,13 +239,13 @@ plot(result_no[, "time"], result_no[, "I"] / N *100,
 # the calculation to Rt
 ```{r}
 # Calculate Rt for each time point
-Rt_values <- 1.31 * params_phase1["Cj"] * (result_all_phases[, "S"] / params_phase1["N"])
+Rt_values <- 1.48 * params_phase1["Cj"] * (result_all_phases[, "S"] / params_phase1["N"])
 
 # Update Rt values for Phase 2
-Rt_values[time_phase2] <- 1.23 * params_phase2["Cj"] * (result_all_phases[time_phase2, "S"] / params_phase2["N"])
+Rt_values[time_phase2] <- 1.26 * params_phase2["Cj"] * (result_all_phases[time_phase2, "S"] / params_phase2["N"])
 
 # Update Rt values for Phase 3
-Rt_values[time_phase3] <- 0.75 * params_phase3["Cj"] * (result_all_phases[time_phase3, "S"] / params_phase3["N"])
+Rt_values[time_phase3] <- 1.16 * params_phase3["Cj"] * (result_all_phases[time_phase3, "S"] / params_phase3["N"])
 
 # Plot Rt vs time
 plot(result_all_phases[, "time"], Rt_values,

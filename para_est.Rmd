@@ -18,14 +18,6 @@ library(R0)
 
 # Part 1, import the real influenza data
 ```{r}
-# real influenza cases from Jan 12 to Feb 23
-para_est <- read_csv("dat0.csv") %>% 
-  janitor::clean_names() %>% 
-  subset(date < 43830) 
-
-cumI = cumsum(para_est[,3])
-
-
 # Define the reference date
 reference_date <- as.Date("2020-01-01")
 
@@ -98,6 +90,7 @@ summary(fit1)
 
 # compute R0 based on the model-fit
 R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
+# R0 = 1.48
 ```
 
 
@@ -112,6 +105,7 @@ summary(fit1)
 
 # compute R0 based on the model-fit
 R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
+# R0 = 1.26
 ```
 
 
@@ -126,6 +120,8 @@ summary(fit1)
 
 # compute R0 based on the model-fit
 R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
+
+# R0 = 1.16
 ```
 
 
