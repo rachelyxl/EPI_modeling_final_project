@@ -164,7 +164,7 @@ est.R0.ML(df$real_flu_case, # the data
 est.R0.ML(df$real_flu_case, # the data
           mGT, # the distribution of serial interval
           begin=1, # the start of the data
-          end=34, # ADJUST THE NUMBER OF DAYS TO INCLUDE IN THE MODEL HERE
+          end=33, # ADJUST THE NUMBER OF DAYS TO INCLUDE IN THE MODEL HERE
           range=c(0.01,50) # the range of possible values to test
           )
 ```
@@ -176,7 +176,7 @@ est.R0.ML(df$real_flu_case, # the data
 est.R0.ML(df$real_flu_case, # the data
           mGT, # the distribution of serial interval
           begin=1, # the start of the data
-          end=50, # ADJUST THE NUMBER OF DAYS TO INCLUDE IN THE MODEL HERE
+          end=55, # ADJUST THE NUMBER OF DAYS TO INCLUDE IN THE MODEL HERE
           range=c(0.01,50) # the range of possible values to test
           )
 ```
