@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(deSolve)
-library(R0)
+
 ```
 
 
@@ -139,9 +139,47 @@ R = 1 + fit1$coefficients[2]*D   # slope: fit1$coefficients[2]
 ```
 
 
+# Part 5, estimate R0 use MLE method - the serial interval is obtain from the paper: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3057478/#:~:text=The%20serial%20interval%20is%20the,(from%20infection%20to%20symptoms).
+
+```{r}
+# load the library for MLE
+library(R0)
+
+# First we need the distribution of generation time (i.e. serial interval)
+mGT<-generation.time("gamma", c(3.6, 1.6))
+
+# EXAMPLE: FOR THE FIRST 7 DAYS
+# Maximum Likelihood Estimation using the est.R0.ML function
+est.R0.ML(df$real_flu_case, # the data
+          mGT, # the distribution of serial interval
+          begin=1, # the start of the data
+          end=10, # ADJUST THE NUMBER OF DAYS TO INCLUDE IN THE MODEL HERE
+          range=c(0.01,50) # the range of possible values to test
+          )
+```
+
+```{r}
+# EXAMPLE: FOR THE FIRST 7 DAYS
+# Maximum Likelihood Estimation using the est.R0.ML function
+est.R0.ML(df$real_flu_case, # the data
+          mGT, # the distribution of serial interval
+          begin=1, # the start of the data
+          end=34, # ADJUST THE NUMBER OF DAYS TO INCLUDE IN THE MODEL HERE
+          range=c(0.01,50) # the range of possible values to test
+          )
+```
 
 
-
+```{r}
+# EXAMPLE: FOR THE FIRST 7 DAYS
+# Maximum Likelihood Estimation using the est.R0.ML function
+est.R0.ML(df$real_flu_case, # the data
+          mGT, # the distribution of serial interval
+          begin=1, # the start of the data
+          end=50, # ADJUST THE NUMBER OF DAYS TO INCLUDE IN THE MODEL HERE
+          range=c(0.01,50) # the range of possible values to test
+          )
+```
 
 
 
