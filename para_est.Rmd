@@ -159,7 +159,7 @@ est.R0.ML(df$real_flu_case, # the data
 ```
 
 ```{r}
-# EXAMPLE: FOR THE FIRST 7 DAYS
+# EXAMPLE: FOR THE FIRST 33 DAYS
 # Maximum Likelihood Estimation using the est.R0.ML function
 est.R0.ML(df$real_flu_case, # the data
           mGT, # the distribution of serial interval
@@ -171,7 +171,7 @@ est.R0.ML(df$real_flu_case, # the data
 
 
 ```{r}
-# EXAMPLE: FOR THE FIRST 7 DAYS
+# EXAMPLE: FOR THE FIRST 55 DAYS
 # Maximum Likelihood Estimation using the est.R0.ML function
 est.R0.ML(df$real_flu_case, # the data
           mGT, # the distribution of serial interval
